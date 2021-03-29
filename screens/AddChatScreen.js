@@ -41,7 +41,11 @@ function AddChatScreen({ navigation }) {
         }
         onSubmitEditing={createChat}
       />
-      <Button onPress={createChat} title="Create a new chat" />
+      <Button
+        disabled={!input}
+        onPress={createChat}
+        title="Create a new chat"
+      />
     </View>
   );
 }
