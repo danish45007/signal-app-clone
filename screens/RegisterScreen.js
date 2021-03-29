@@ -1,15 +1,35 @@
-import React, { useState } from "react";
+import React, { useLayoutEffect, useState } from "react";
 import { Button, Input, Image } from "react-native-elements";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { KeyboardAvoidingView } from "react-native";
 import { Platform } from "react-native";
+import { auth } from "../firebase";
 
 const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const signIn = () => {};
+  const [imageUrl, setImageUrl] = useState("");
+
+  // useLayoutEffect(() => {
+  //   navigation.setOptions({
+  //     headerBackTitle: "Back to Login",
+  //   });
+  // }, [navigation]);
+  const register = () => {
+    auth
+      .createUserWithEmailAndPassword(email, password)
+      .then((authUser) => {
+        authUser.user.updateProfile({
+          displayName: name,
+          photoURL:
+            imageUrl ||
+            "https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50",
+        });
+      })
+      .catch((error) => alert(error.message));
+  };
   const keyboardVerticalOffset = Platform.OS === "ios" ? 40 : 10;
   return (
     <KeyboardAvoidingView
@@ -45,15 +65,21 @@ const RegisterScreen = ({ navigation }) => {
           secureTextEntry
           type="password"
           value={password}
-          onChange={(text) => setPassword(text)}
+          onChangeText={(text) => setPassword(text)}
+        />
+        <Input
+          placeholder="Profile Picture Url (optional)"
+          type="text"
+          value={imageUrl}
+          onChangeText={(text) => setImageUrl(text)}
+          onSubmitEditing={register}
         />
       </View>
-      <Button containerStyle={styles.button} onPress={signIn} title="Login" />
       <Button
         containerStyle={styles.button}
-        onPress={() => navigation.navigate("Register")}
+        onPress={register}
         title="Register"
-        type="outline"
+        raised
       />
       <View style={{ height: 100 }} />
     </KeyboardAvoidingView>
